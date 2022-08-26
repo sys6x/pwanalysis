@@ -1,0 +1,469 @@
+Analysis of BRP's users' passwords leaked by RansomExx on 2022-08-24
+
+GENERAL NOTES
+
+-Pipal and PACK2 (see further down the logs) have been used to generate those stats, mostly to corroborate each tool's results.
+-pwd.txt is from the pwds.zip file available from RansomExx's leak page in their 2nd dump.
+-Those entries seem to come from a credential stealer plugin to their malware or from dumped saved browser passwords.
+-Main lengths are between 8 and 10 chars
+-2 lines with longest lengths are hashes, 3rd is a real password.
+-Main content for entries are strings + digits. As we can see with the prevalence of ?u?l?l?l?l?l?d?d
+-A good mask to start a crack would be -1 ?u?l -2 ?l?d ?1?l?l?l?2?2?2?2 and then adding ?l for each length +1 until ~15
+-These results aren't representative of the passwords used in BRP's infrastructure as it is mostly accounts linked to its users.  However, they can help in cracking official BRP passwords.
+-Some entries are linked to internal tools, such as network switches or a SIEM instance.
+-Why are there entries linking to russian-based stuff there?  Russian-based users or maybe an "oops"?
+-They can also help BRP's IT staff in deciding their password policies.
+
+
+Number of entries relating to BRP in the password
+brp-pwds$ grep -iF brp onlypasswords |wc -l
+349
+Number of entries relating to Bombardier in the password
+brp-pwds$ grep -iF bombardier onlypasswords |wc -l
+9
+
+
+HOW I PARSED + "VALIDATED" IT
+
+Total number of entries in the original file, cutting the password section
+brp-pwds$ cat pwd.txt |cut -d"," -f3|cut -d"'" -f4|wc -l
+22775
+Total number of UNIQUE entries in the original files, with the password section being cut
+brp-pwds$ cat pwd.txt |cut -d"," -f3|cut -d"'" -f4|sort -u|wc -l
+9723
+Counting the entries in our work file where the password section has been dumped
+brp-pwds$ wc -l onlypasswords
+22775 onlypasswords
+
+
+OUTPUT FROM TOOLS
+https://github.com/digininja/pipal
+
+pipal$ ./pipal.rb -v -o ../pipal-report ../onlypasswords
+Generating stats, hit CTRL-C to finish early and dump stats on words already processed.
+Please wait...
+Processing:    100% |ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo| Time: 00:00:01
+
+
+brp-pwds/pipal$ cd ..
+brp-pwds$ cat pipal-report
+Basic Results
+
+Total entries = 22756
+Total unique entries = 9718
+
+Top 10 passwords
+Berque24 = 368 (1.62%)
+Mach11998 = 169 (0.74%)
+derrick194 = 131 (0.58%)
+yabxm010 = 131 (0.58%)
+vB24021995!? = 122 (0.54%)
+Sfqxoy17 = 119 (0.52%)
+sophie78 = 117 (0.51%)
+Gamma563 = 116 (0.51%)
+Carlino21! = 111 (0.49%)
+Anish@123 = 84 (0.37%)
+
+Top 10 base words
+berque = 387 (1.7%)
+mach = 226 (0.99%)
+anish = 179 (0.79%)
+sophie = 174 (0.76%)
+derrick = 159 (0.7%)
+sfqxoy = 156 (0.69%)
+yabxm = 155 (0.68%)
+espana = 152 (0.67%)
+samabope = 145 (0.64%)
+gamma = 144 (0.63%)
+
+Password length (length ordered)
+1 = 36 (0.16%)
+2 = 17 (0.07%)
+3 = 47 (0.21%)
+4 = 185 (0.81%)
+5 = 93 (0.41%)
+6 = 543 (2.39%)
+7 = 536 (2.36%)
+8 = 5476 (24.06%)
+9 = 4168 (18.32%)
+10 = 3507 (15.41%)
+11 = 1659 (7.29%)
+12 = 2143 (9.42%)
+13 = 1134 (4.98%)
+14 = 743 (3.27%)
+15 = 1439 (6.32%)
+16 = 358 (1.57%)
+17 = 151 (0.66%)
+18 = 134 (0.59%)
+19 = 101 (0.44%)
+20 = 90 (0.4%)
+21 = 52 (0.23%)
+22 = 34 (0.15%)
+23 = 11 (0.05%)
+24 = 17 (0.07%)
+25 = 6 (0.03%)
+26 = 5 (0.02%)
+27 = 1 (0.0%)
+28 = 1 (0.0%)
+29 = 2 (0.01%)
+30 = 2 (0.01%)
+32 = 11 (0.05%)
+33 = 1 (0.0%)
+37 = 7 (0.03%)
+39 = 1 (0.0%)
+40 = 5 (0.02%)
+42 = 1 (0.0%)
+44 = 1 (0.0%)
+52 = 28 (0.12%)
+60 = 2 (0.01%)
+64 = 1 (0.0%)
+79 = 1 (0.0%)
+102 = 1 (0.0%)
+120 = 3 (0.01%)
+189 = 1 (0.0%)
+222 = 1 (0.0%)
+
+Password length (count ordered)
+8 = 5476 (24.06%)
+9 = 4168 (18.32%)
+10 = 3507 (15.41%)
+12 = 2143 (9.42%)
+11 = 1659 (7.29%)
+15 = 1439 (6.32%)
+13 = 1134 (4.98%)
+14 = 743 (3.27%)
+6 = 543 (2.39%)
+7 = 536 (2.36%)
+16 = 358 (1.57%)
+4 = 185 (0.81%)
+17 = 151 (0.66%)
+18 = 134 (0.59%)
+19 = 101 (0.44%)
+5 = 93 (0.41%)
+20 = 90 (0.4%)
+21 = 52 (0.23%)
+3 = 47 (0.21%)
+1 = 36 (0.16%)
+22 = 34 (0.15%)
+52 = 28 (0.12%)
+2 = 17 (0.07%)
+24 = 17 (0.07%)
+23 = 11 (0.05%)
+32 = 11 (0.05%)
+37 = 7 (0.03%)
+25 = 6 (0.03%)
+26 = 5 (0.02%)
+40 = 5 (0.02%)
+120 = 3 (0.01%)
+29 = 2 (0.01%)
+30 = 2 (0.01%)
+60 = 2 (0.01%)
+27 = 1 (0.0%)
+28 = 1 (0.0%)
+33 = 1 (0.0%)
+39 = 1 (0.0%)
+42 = 1 (0.0%)
+44 = 1 (0.0%)
+64 = 1 (0.0%)
+79 = 1 (0.0%)
+102 = 1 (0.0%)
+189 = 1 (0.0%)
+222 = 1 (0.0%)
+
+   |
+   |
+   |
+   |
+   |
+   |
+   |
+   ||
+   ||
+   ||
+   |||
+   |||
+   |||
+  ||||
+  ||||
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+000000000011111111112222222222333333333344444444445555555555666666666677
+012345678901234567890123456789012345678901234567890123456789012345678901
+
+One to six characters = 921 (4.05%)
+One to eight characters = 6933 (30.47%)
+More than eight characters = 15823 (69.53%)
+
+Only lowercase alpha = 913 (4.01%)
+Only uppercase alpha = 67 (0.29%)
+Only alpha = 980 (4.31%)
+Only numeric = 694 (3.05%)
+
+First capital last symbol = 3291 (14.46%)
+First capital last number = 7945 (34.91%)
+
+Single digit on the end = 2026 (8.9%)
+Two digits on the end = 3849 (16.91%)
+Three digits on the end = 2138 (9.4%)
+
+Last number
+0 = 1264 (5.55%)
+1 = 2196 (9.65%)
+2 = 1183 (5.2%)
+3 = 1734 (7.62%)
+4 = 1668 (7.33%)
+5 = 1050 (4.61%)
+6 = 775 (3.41%)
+7 = 1090 (4.79%)
+8 = 1182 (5.19%)
+9 = 997 (4.38%)
+
+ |
+ |
+ |
+ | ||
+ | ||
+ | ||
+|| ||
+|||||   |
+|||||| |||
+|||||| |||
+||||||||||
+||||||||||
+||||||||||
+||||||||||
+||||||||||
+||||||||||
+0123456789
+
+Last digit
+1 = 2196 (9.65%)
+3 = 1734 (7.62%)
+4 = 1668 (7.33%)
+0 = 1264 (5.55%)
+2 = 1183 (5.2%)
+8 = 1182 (5.19%)
+7 = 1090 (4.79%)
+5 = 1050 (4.61%)
+9 = 997 (4.38%)
+6 = 775 (3.41%)
+
+Last 2 digits (Top 10)
+23 = 742 (3.26%)
+24 = 462 (2.03%)
+01 = 429 (1.89%)
+17 = 344 (1.51%)
+22 = 327 (1.44%)
+10 = 306 (1.34%)
+34 = 287 (1.26%)
+11 = 269 (1.18%)
+05 = 262 (1.15%)
+20 = 256 (1.12%)
+
+Last 3 digits (Top 10)
+123 = 490 (2.15%)
+234 = 263 (1.16%)
+998 = 189 (0.83%)
+999 = 154 (0.68%)
+010 = 152 (0.67%)
+563 = 148 (0.65%)
+194 = 136 (0.6%)
+021 = 128 (0.56%)
+020 = 125 (0.55%)
+022 = 116 (0.51%)
+
+Last 4 digits (Top 10)
+1234 = 237 (1.04%)
+1998 = 189 (0.83%)
+2020 = 125 (0.55%)
+2021 = 121 (0.53%)
+2022 = 112 (0.49%)
+3456 = 94 (0.41%)
+4530 = 84 (0.37%)
+1983 = 73 (0.32%)
+2323 = 72 (0.32%)
+2019 = 69 (0.3%)
+
+Last 5 digits (Top 10)
+11998 = 188 (0.83%)
+23456 = 92 (0.4%)
+12345 = 65 (0.29%)
+28991 = 63 (0.28%)
+78123 = 61 (0.27%)
+31488 = 55 (0.24%)
+50815 = 37 (0.16%)
+11295 = 36 (0.16%)
+40295 = 33 (0.15%)
+90117 = 31 (0.14%)
+
+Character sets
+mixedalphaspecialnum: 7038 (30.93%)
+mixedalphanum: 7030 (30.89%)
+loweralphanum: 4001 (17.58%)
+loweralpha: 913 (4.01%)
+numeric: 694 (3.05%)
+loweralphaspecialnum: 570 (2.5%)
+upperalphanum: 394 (1.73%)
+mixedalpha: 246 (1.08%)
+upperalphaspecialnum: 115 (0.51%)
+mixedalphaspecial: 83 (0.36%)
+upperalpha: 67 (0.29%)
+special: 52 (0.23%)
+loweralphaspecial: 26 (0.11%)
+specialnum: 8 (0.04%)
+upperalphaspecial: 2 (0.01%)
+
+Character set ordering
+stringdigit: 8674 (38.12%)
+othermask: 8639 (37.96%)
+stringspecialdigit: 1692 (7.44%)
+allstring: 1226 (5.39%)
+stringdigitstring: 854 (3.75%)
+alldigit: 694 (3.05%)
+digitstring: 688 (3.02%)
+digitstringdigit: 154 (0.68%)
+allspecial: 52 (0.23%)
+stringspecial: 49 (0.22%)
+stringspecialstring: 26 (0.11%)
+specialstring: 6 (0.03%)
+specialstringspecial: 2 (0.01%)
+
+
+https://github.com/hops/pack2
+
+$ ./pack2 statsgen ../../../onlypasswords
+[+] Analyzed 22756 / 22775 passwords.
+[*] Length distribution: (min: 1 max: 222)
+[+]                          8:  24.07% (5477)
+[+]                          9:  18.31% (4167)
+[+]                         10:  15.40% (3505)
+[+]                         12:   9.40% (2139)
+[+]                         11:   7.31% (1663)
+[+]                         15:   6.33% (1440)
+[+]                         13:   5.00% (1138)
+[+]                         14:   3.27% (743)
+[+]                          6:   2.39% (544)
+[+]                          7:   2.34% (533)
+[+]                         16:   1.58% (359)
+[+]                          4:   0.81% (184)
+[+]                         17:   0.66% (151)
+[+]                         18:   0.58% (133)
+[+]                         19:   0.45% (102)
+[+]                          5:   0.40% (92)
+[+]                         20:   0.40% (90)
+[+]                         21:   0.23% (52)
+[+]                          3:   0.22% (49)
+[+]                          1:   0.16% (36)
+[+]                         22:   0.15% (34)
+[+]                         52:   0.12% (28)
+[+]                         24:   0.07% (17)
+[+]                          2:   0.07% (15)
+[+]                         32:   0.05% (11)
+[+]                         23:   0.05% (11)
+[+]                         37:   0.03% (7)
+[+]                         25:   0.03% (6)
+[+]                         26:   0.02% (5)
+[+]                         40:   0.02% (5)
+[+]                        120:   0.01% (3)
+[+]                         60:   0.01% (2)
+[+]                         30:   0.01% (2)
+[+]                         29:   0.01% (2)
+[+]                         33:   0.00% (1)
+[+]                         28:   0.00% (1)
+[+]                        102:   0.00% (1)
+[+]                         79:   0.00% (1)
+[+]                         39:   0.00% (1)
+[+]                        189:   0.00% (1)
+[+]                         42:   0.00% (1)
+[+]                         27:   0.00% (1)
+[+]                         64:   0.00% (1)
+[+]                        222:   0.00% (1)
+[+]                         44:   0.00% (1)
+
+[*] Charset distribution:                    count   min   max
+[+]       mixedalphaspecialnum:  36.68%       8347     5   222
+[+]              mixedalphanum:  30.87%       7024     4   102
+[+]              loweralphanum:  17.57%       3999     2    64
+[+]                 loweralpha:   4.00%        911     1    42
+[+]       loweralphaspecialnum:   3.14%        715     4   120
+[+]                    numeric:   3.05%        693     1    16
+[+]              upperalphanum:   1.72%        392     3    18
+[+]                 mixedalpha:   1.07%        243     2    22
+[+]       upperalphaspecialnum:   0.63%        144     5    16
+[+]          mixedalphaspecial:   0.47%        106     4    26
+[+]                 upperalpha:   0.29%         65     1    26
+[+]                    special:   0.23%         53     1    14
+[+]          loweralphaspecial:   0.19%         43     2    27
+[+]                 specialnum:   0.07%         16     2    19
+[+]          upperalphaspecial:   0.02%          5     2    10
+
+[*] Simple masks distribution:               count   min   max
+[+]                stringdigit:  38.09%       8668     4   102
+[+]         stringdigitspecial:  14.14%       3217     6    24
+[+]                  othermask:  13.31%       3029     5   222
+[+]         stringspecialdigit:   8.28%       1885     6    33
+[+]                     string:   5.36%       1219     1    42
+[+]          stringdigitstring:   3.74%        852     4    20
+[+]                      digit:   3.05%        693     1    16
+[+]                digitstring:   3.02%        687     2    22
+[+]   stringdigitstringspecial:   1.42%        324     5    22
+[+]         digitstringspecial:   1.32%        300     7    17
+[+]     stringdigitstringdigit:   1.24%        283     5    20
+[+]   stringspecialstringdigit:   0.99%        225     6    22
+[+]           digitstringdigit:   0.68%        154     5    24
+[+]   stringspecialdigitstring:   0.57%        130     8    15
+[+]         specialstringdigit:   0.54%        123     4    18
+[+]   stringdigitspecialstring:   0.47%        106     8    22
+[+]     digitstringdigitstring:   0.44%         99     4    18
+[+]   specialstringdigitstring:   0.42%         96     4    19
+[+]    stringdigitspecialdigit:   0.40%         92     8    15
+[+]  specialstringdigitspecial:   0.38%         87     8    17
+[+]  stringspecialdigitspecial:   0.29%         67     8    17
+[+]         digitspecialstring:   0.29%         65     7    15
+[+]              stringspecial:   0.28%         63     4    22
+[+]         specialdigitstring:   0.24%         54     8    15
+[+]                    special:   0.23%         53     1    14
+[+]    digitstringdigitspecial:   0.21%         47     9    16
+[+]        stringspecialstring:   0.16%         37     5    20
+[+]    digitstringspecialdigit:   0.07%         15     7    18
+[+]   digitstringspecialstring:   0.06%         14     8    17
+[+]              specialstring:   0.06%         14     2    15
+[+]  specialstringspecialdigit:   0.06%         13     9    17
+[+]    specialdigitstringdigit:   0.04%         10     9    17
+[+]    digitspecialstringdigit:   0.03%          7     7    11
+[+] stringspecialstringspecial:   0.03%          6     8    19
+[+]  digitspecialstringspecial:   0.02%          5    10    12
+[+]    digitspecialdigitstring:   0.02%          5    10    10
+[+]               digitspecial:   0.02%          4     4    16
+[+]  specialdigitstringspecial:   0.01%          2    12    12
+[+]       specialstringspecial:   0.01%          2    11    13
+[+]          digitspecialdigit:   0.01%          2     3     7
+[+]   digitspecialdigitspecial:   0.00%          1     9     9
+[+]               specialdigit:   0.00%          1     2     2
+
+[*] Masks (top 25):
+[+]           ?u?l?l?l?l?l?d?d:   4.45% (1013)
+[+]           ?l?l?l?l?d?d?d?d:   1.89% (430)
+[+]           ?l?l?l?l?l?l?d?d:   1.67% (379)
+[+]         ?u?l?l?l?l?l?l?d?d:   1.49% (338)
+[+]           ?l?l?l?l?l?d?d?d:   1.47% (334)
+[+]           ?u?l?l?l?l?d?d?d:   1.29% (294)
+[+]           ?u?l?l?l?d?d?d?d:   1.26% (287)
+[+]           ?l?l?l?l?l?l?l?l:   1.23% (281)
+[+]         ?u?l?l?l?l?d?d?d?d:   1.16% (263)
+[+]         ?u?l?l?l?l?l?l?l?d:   1.13% (258)
+[+]           ?u?l?l?l?l?l?l?d:   1.00% (227)
+[+]       ?u?l?l?l?l?l?d?d?d?d:   0.98% (224)
+[+]         ?u?l?l?l?d?d?d?d?d:   0.98% (222)
+[+]         ?u?l?l?l?l?s?d?d?d:   0.97% (220)
+[+]       ?l?l?l?l?l?l?l?d?d?d:   0.97% (220)
+[+]         ?u?l?l?l?l?l?d?d?s:   0.96% (219)
+[+]           ?d?d?d?d?d?d?d?d:   0.92% (210)
+[+]       ?u?l?l?l?l?l?l?d?d?s:   0.85% (194)
+[+]               ?d?d?d?d?d?d:   0.84% (192)
+[+]         ?u?l?l?l?l?l?l?d?s:   0.70% (159)
+[+]         ?u?l?l?l?d?d?d?d?s:   0.66% (151)
+[+]       ?u?l?l?l?l?l?l?l?d?s:   0.66% (150)
+[+]                   ?d?d?d?d:   0.64% (146)
+[+]     ?u?l?l?l?l?l?l?d?d?d?d:   0.62% (140)
+[+]             ?l?l?l?l?l?l?l:   0.60% (136)
+
